@@ -15,7 +15,35 @@ const interceptorResponseFulfilled = (res: AxiosResponse) => {
 }
 
 const interceptorResponseRejected = (error: AxiosError<ApiFailureResponse>) => {
-  return Promise.reject(new ApiException(error.response?.data.errors || 'UNKNOWN_ERROR'))
+  if (error.response) {
+    // HTTP 에러 상태 코드에 따른 처리
+    switch (error.response.status) {
+      case 404:
+        return Promise.reject(new ApiException('NOT_FOUND'))
+      case 400:
+        return Promise.reject(new ApiException('BAD_REQUEST'))
+      case 401:
+        return Promise.reject(new ApiException('UNAUTHORIZED'))
+      case 403:
+        return Promise.reject(new ApiException('FORBIDDEN'))
+      case 500:
+        return Promise.reject(new ApiException('INTERNAL_SERVER_ERROR'))
+      case 503:
+        return Promise.reject(new ApiException('SERVICE_UNAVAILABLE'))
+      case 504:
+        return Promise.reject(new ApiException('GATEWAY_TIMEOUT'))
+    }
+  }
+
+  if (error.code === 'ECONNABORTED') {
+    return Promise.reject(new ApiException('NETWORK_TIMEOUT'))
+  }
+
+  if (error.code === 'ERR_NETWORK') {
+    return Promise.reject(new ApiException('NETWORK_ERROR'))
+  }
+
+  return Promise.reject(new ApiException('UNKNOWN_ERROR'))
 }
 
 instance.interceptors.response.use(interceptorResponseFulfilled, interceptorResponseRejected)

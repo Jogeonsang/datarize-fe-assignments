@@ -4,12 +4,13 @@ import { AArrowUp, AArrowDown } from '@mynaui/icons-react'
 import Input from '~/components/input'
 import { match, P } from 'ts-pattern'
 
-import * as S from './style'
 import PurchasesByCustomer from '../purchasesByCustomer'
 import CustomerListEmpty from './empty'
 import CustomerListError from './error'
 import CustomerListLoading from './loading'
 import { GetCustomersParams } from '~/api/customer/getCustomers'
+
+import * as S from './style'
 
 function CustomerList() {
   const [name, setName] = useState<string>('')
@@ -43,8 +44,6 @@ function CustomerList() {
       </S.TableRow>
     ))
   }, [])
-
-  console.log(searchError, searchCustomersError)
 
   const renderContent = useMemo(() => {
     const hasError = searchError !== null || searchCustomersError !== null

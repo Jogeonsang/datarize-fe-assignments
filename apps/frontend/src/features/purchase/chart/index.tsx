@@ -4,10 +4,9 @@ import useResponsive from '~/hooks/useResponsive'
 import * as S from './style'
 
 import { css } from '@emotion/react'
-import { DateRange } from 'react-day-picker'
 
 type PurchaseChartProps = {
-  dateRange: DateRange
+  dateRange: { from?: Date; to?: Date } | undefined
 }
 
 function PurchaseChart({ dateRange }: PurchaseChartProps) {

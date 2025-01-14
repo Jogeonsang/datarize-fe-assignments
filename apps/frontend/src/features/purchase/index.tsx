@@ -4,14 +4,11 @@ import PurchasePeriod from './period'
 import * as S from './style'
 
 import { PeriodType } from './type'
-import { DateRange } from 'react-day-picker'
+import { DateRange } from '~/api/purchase/getPurchase'
 
 function Purchase() {
   const [selectedPeriod, setSelectedPeriod] = useState<PeriodType>('30days')
-  const [dateRange, setDateRange] = useState<DateRange>({
-    from: undefined,
-    to: undefined,
-  })
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined)
 
   return (
     <S.Container>

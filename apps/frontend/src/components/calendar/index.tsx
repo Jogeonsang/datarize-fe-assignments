@@ -1,110 +1,161 @@
-import { DayPicker, DayPickerProps } from 'react-day-picker'
-import 'react-day-picker/dist/style.css'
-import { css } from '@emotion/react'
+import {
+  format,
+  startOfMonth,
+  endOfMonth,
+  eachDayOfInterval,
+  isSameDay,
+  isToday,
+  isWithinInterval,
+  isBefore,
+} from 'date-fns'
+import { ko } from 'date-fns/locale'
+import * as S from './style'
 
-function Calendar(props: DayPickerProps) {
+type SingleModeProps = {
+  mode: 'single'
+  selectedDate?: Date | null
+  onDateSelect: (date: Date) => void
+  selectedRange?: never
+  onRangeSelect?: never
+}
+
+type RangeModeProps = {
+  mode: 'range'
+  selectedRange?: { from: Date; to: Date } | null
+  onRangeSelect: (range: { from: Date; to: Date } | null) => void
+  selectedDate?: never
+  onDateSelect?: never
+}
+
+type BaseCalendarProps = {
+  availableDates?: string[]
+  minDate?: Date
+  maxDate?: Date
+  defaultMonth?: Date
+}
+
+type CalendarProps = BaseCalendarProps & (SingleModeProps | RangeModeProps)
+
+function Calendar({
+  mode,
+  selectedDate,
+  selectedRange,
+  onDateSelect,
+  onRangeSelect,
+  availableDates,
+  minDate,
+  maxDate,
+  defaultMonth,
+}: CalendarProps) {
+  const today = defaultMonth || new Date()
+  const firstDayOfMonth = startOfMonth(today)
+  const lastDayOfMonth = endOfMonth(today)
+
+  const daysInMonth = eachDayOfInterval({
+    start: firstDayOfMonth,
+    end: lastDayOfMonth,
+  })
+
+  const startingDayIndex = firstDayOfMonth.getDay()
+  const daysOfWeek = ['일', '월', '화', '수', '목', '금', '토']
+
+  const isDateAvailable = (date: Date) => {
+    if (!availableDates) return true
+    return availableDates.includes(format(date, 'yyyy-MM-dd'))
+  }
+
+  const isDateSelectable = (date: Date) => {
+    if (minDate && date < minDate) return false
+    if (maxDate && date > maxDate) return false
+    return isDateAvailable(date)
+  }
+
+  const isInRange = (date: Date) => {
+    if (!selectedRange) return false
+    return isWithinInterval(date, {
+      start: selectedRange.from,
+      end: selectedRange.to,
+    })
+  }
+
+  const isRangeStart = (date: Date) => {
+    return selectedRange?.from && isSameDay(date, selectedRange.from)
+  }
+
+  const isRangeEnd = (date: Date) => {
+    return selectedRange?.to && isSameDay(date, selectedRange.to)
+  }
+
+  const handleDateClick = (date: Date) => {
+    if (!isDateSelectable(date)) return
+
+    if (mode === 'single' && onDateSelect) {
+      onDateSelect(date)
+      return
+    }
+
+    if (mode === 'range' && onRangeSelect) {
+      if (!selectedRange) {
+        onRangeSelect({ from: date, to: date })
+      } else if (!selectedRange.to || isSameDay(selectedRange.from, selectedRange.to)) {
+        // 첫 번째 날짜가 이미 선택된 경우
+        if (isBefore(date, selectedRange.from)) {
+          onRangeSelect({ from: date, to: selectedRange.from })
+        } else {
+          onRangeSelect({ from: selectedRange.from, to: date })
+        }
+      } else {
+        // 새로운 범위 시작
+        onRangeSelect({ from: date, to: date })
+      }
+    }
+  }
+
   return (
-    <div css={calendarStyles}>
-      <DayPicker
-        {...props}
-        captionLayout="dropdown"
-        ISOWeek
-        hideNavigation
-        styles={{
-          day: { margin: 0 },
-          day_selected: { backgroundColor: '#f9ffa8' },
-          day_today: { color: '#000000' },
-          day_range_start: {
-            backgroundColor: '#f9ffa8 !important',
-            color: 'black !important',
-          },
-          day_range_end: {
-            backgroundColor: '#f9ffa8 !important',
-            color: 'black !important',
-          },
-          day_range_middle: { backgroundColor: 'rgba(249, 255, 168, 0.3)' },
-        }}
-        modifiersStyles={{
-          selected: { backgroundColor: '#f9ffa8 !important' },
-          range_start: { backgroundColor: '#f9ffa8 !important' },
-          range_end: { backgroundColor: '#f9ffa8 !important' },
-          range_middle: { backgroundColor: 'rgba(249, 255, 168, 0.3)' },
-        }}
-      />
-    </div>
+    <S.CalendarContainer>
+      <S.Header>
+        <S.MonthTitle>{format(today, 'yyyy년 MM월', { locale: ko })}</S.MonthTitle>
+      </S.Header>
+
+      <S.DaysOfWeek>
+        {daysOfWeek.map((day, index) => (
+          <S.DayOfWeek key={day} isDayoff={index === 0 || index === 6}>
+            {day}
+          </S.DayOfWeek>
+        ))}
+      </S.DaysOfWeek>
+
+      <S.DaysGrid>
+        {Array.from({ length: startingDayIndex }).map((_, index) => (
+          <S.EmptyDay key={`empty-${index}`} />
+        ))}
+
+        {daysInMonth.map((date) => {
+          const isSelected =
+            mode === 'single' ? (selectedDate ? isSameDay(date, selectedDate) : false) : isInRange(date)
+          const selectable = isDateSelectable(date)
+          const rangeStart = isRangeStart(date)
+          const rangeEnd = isRangeEnd(date)
+
+          return (
+            <S.Day
+              key={format(date, 'yyyy-MM-dd')}
+              onClick={() => handleDateClick(date)}
+              isSelected={isSelected}
+              isToday={isToday(date)}
+              isAvailable={selectable}
+              isDayoff={date.getDay() === 0 || date.getDay() === 6}
+              isRangeStart={rangeStart}
+              isRangeEnd={rangeEnd}
+            >
+              {date.getDate()}
+              {isToday(date) && <S.TodayDot>•</S.TodayDot>}
+            </S.Day>
+          )
+        })}
+      </S.DaysGrid>
+    </S.CalendarContainer>
   )
 }
 
 export default Calendar
-
-const calendarStyles = css`
-  .rdp {
-    margin: 0;
-    --rdp-range_start-date-background-color: #f9ffa8;
-    --rdp-range_start-color: black;
-    --rdp-range_end-date-background-color: #f9ffa8;
-    --rdp-range_end-color: black;
-  }
-
-  .rdp-root {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .rdp-months {
-    background-color: white;
-    border-radius: 8px;
-    padding: 16px;
-  }
-
-  .rdp-selected {
-    font: inherit;
-  }
-  .rdp-day_selected {
-    background-color: #f9ffa8 !important;
-    color: black !important;
-  }
-
-  .rdp-day_selected:hover {
-    background-color: #f0f68c !important;
-  }
-
-  .rdp-range_start {
-    color: black !important;
-    background: linear-gradient(var(--rdp-gradient-direction), transparent 50%, rgba(249, 255, 168, 0.4) 50%);
-  }
-
-  .rdp-range_end {
-    color: black !important;
-    background: linear-gradient(var(--rdp-gradient-direction), rgba(249, 255, 168, 0.4) 50%, transparent 50%);
-  }
-
-  .rdp-range_start .rdp-day_button,
-  .rdp-range_end .rdp-day_button {
-    background-color: #ffe855 !important;
-    color: black !important;
-    border: 1px solid #ffe855 !important;
-  }
-
-  .rdp-range_middle .rdp-day_button {
-    background-color: rgba(249, 255, 168, 0.2) !important;
-    color: black !important;
-  }
-
-  .rdp-day:hover {
-    background-color: rgba(249, 255, 168, 0.4) !important;
-  }
-
-  .rdp-day_range_middle {
-    background-color: rgba(249, 255, 168, 0.3) !important;
-  }
-
-  .rdp-today:not(.rdp-outside) {
-    color: #ffe855;
-  }
-
-  .rdp-chevron {
-    fill: #000;
-  }
-`

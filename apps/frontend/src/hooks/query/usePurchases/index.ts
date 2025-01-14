@@ -1,15 +1,17 @@
 import { useSuspenseQuery, UseSuspenseQueryOptions } from '@tanstack/react-query'
-import { DateRange } from 'react-day-picker'
 import { getPurchases } from '~/api/purchase/getPurchase'
 
 type Response = Awaited<ReturnType<typeof getPurchases>>
 
 const PURCHASES_QUERY_KEY = 'purchases'
 
-export const getPurchasesQueryKey = (dateRange?: DateRange) => [PURCHASES_QUERY_KEY, { dateRange }]
+export const getPurchasesQueryKey = (dateRange?: { from?: Date; to?: Date } | undefined) => [
+  PURCHASES_QUERY_KEY,
+  { dateRange },
+]
 
 export const usePurchases = (
-  dateRange?: DateRange,
+  dateRange?: { from?: Date; to?: Date } | undefined,
   options?: Omit<UseSuspenseQueryOptions<Response>, 'queryKey' | 'queryFn'>,
 ) => {
   return useSuspenseQuery({

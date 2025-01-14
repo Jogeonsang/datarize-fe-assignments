@@ -16,11 +16,11 @@ function CustomerList() {
   const [sortBy, setSortBy] = useState<GetCustomersParams['sortBy']>(undefined)
   const [selectedCustomerId, setSelectedCustomerId] = useState<number | null>(null)
   const { data, error: searchError } = useCustomersSearchResult()
-  const { mutate: searchCustomers, isPending: isSearching } = useCustomersSearch()
+  const { mutate: searchCustomers, isPending: isSearching, error: searchCustomersError } = useCustomersSearch()
 
   const handleSearch = useCallback(() => {
-    searchCustomers({ name })
-  }, [searchCustomers, name])
+    searchCustomers({ name, sortBy })
+  }, [searchCustomers, name, sortBy])
 
   const handleRowClick = (customerId: number) => {
     setSelectedCustomerId(customerId)
@@ -44,14 +44,18 @@ function CustomerList() {
     ))
   }, [])
 
+  console.log(searchError, searchCustomersError)
+
   const renderContent = useMemo(() => {
-    return match({ data, error: searchError, isSearching })
+    const hasError = searchError !== null || searchCustomersError !== null
+
+    return match({ data, hasError, isSearching })
       .with({ isSearching: true }, () => (
         <td colSpan={4}>
           <CustomerListLoading />
         </td>
       ))
-      .with({ error: P.not(P.nullish) }, () => (
+      .with({ hasError: true }, () => (
         <td colSpan={4}>
           <CustomerListError reset={handleSearch} />
         </td>
@@ -59,7 +63,7 @@ function CustomerList() {
       .with({ data: [] }, () => <CustomerListEmpty />)
       .with({ data: P.array(P.any) }, ({ data: customers }) => renderCustomerRows(customers))
       .exhaustive()
-  }, [data, searchError, isSearching, handleSearch, renderCustomerRows])
+  }, [data, searchError, searchCustomersError, isSearching, handleSearch, renderCustomerRows])
 
   useEffect(() => {
     if (!sortBy) return

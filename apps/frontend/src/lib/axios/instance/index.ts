@@ -3,15 +3,15 @@ import { ApiException } from '../exception'
 import { ApiFailureResponse, ApiResponse } from '../type'
 
 export const instance = axios.create({
-  baseURL: import.meta.env.VITE_APP_API_URL,
+  baseURL: import.meta.env.VITE_APP_API_URL || 'http://localhost:4000',
 })
 
 const interceptorResponseFulfilled = (res: AxiosResponse) => {
   if (200 <= res.status && res.status < 300) {
-    return res
+    return res.data
   }
 
-  return Promise.reject(res)
+  return Promise.reject(res.data)
 }
 
 const interceptorResponseRejected = (error: AxiosError<ApiFailureResponse>) => {

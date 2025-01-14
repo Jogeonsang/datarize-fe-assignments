@@ -113,18 +113,6 @@ export const Button = styled.button`
   }
 `
 
-export const EmptyRow = styled(TableRow)`
-  &:hover {
-    background-color: transparent;
-  }
-`
-
-export const EmptyCell = styled(TableCell)`
-  text-align: center;
-  color: #666;
-  padding: 48px 0;
-`
-
 export const ErrorContainer = styled.div`
   display: flex;
   flex-direction: column;
@@ -155,4 +143,16 @@ export const RetryButton = styled.button`
   &:active {
     background-color: #1a1a1a;
   }
+`
+
+export const EmptyRow = styled(TableRow)`
+  &:hover {
+    background-color: transparent;
+  }
+`
+
+export const EmptyCell = styled(TableCell)`
+  text-align: center;
+  color: #666;
+  padding: 48px 0;
 `

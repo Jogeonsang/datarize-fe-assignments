@@ -1,6 +1,6 @@
 import { useSuspenseQuery, UseSuspenseQueryOptions } from '@tanstack/react-query'
 import { DateRange } from 'react-day-picker'
-import { getPurchases } from '~/api/purchase'
+import { getPurchases } from '~/api/purchase/getPurchase'
 
 type Response = Awaited<ReturnType<typeof getPurchases>>
 

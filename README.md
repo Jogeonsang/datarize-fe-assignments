@@ -1,3 +1,8 @@
+# Datarize Frontend 과제 소개
+
+안녕하세요, 조건상입니다. 프론트엔드 과제에 대한 소개는 아래 문서를 참고해주세요.
+[과제 구현 내용 소개](./IMPLEMENTATION.md)
+
 # Datarize Frontend 과제 전형
 
 안녕하세요, 지원자님. Datarize Frontend Developer 서류 전형에 합격하신 것을 축하드립니다.  

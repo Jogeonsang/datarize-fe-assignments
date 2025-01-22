@@ -7,7 +7,7 @@ import { ErrorBoundary } from '~/components/error-boundary'
 import PurchasesByCustomerError from './error'
 import { QueryErrorResetBoundary } from '@tanstack/react-query'
 
-interface PurchasesByCustomerProps {
+type PurchasesByCustomerProps = {
   customerId: number | null
   onClose: () => void
   isOpen: boolean

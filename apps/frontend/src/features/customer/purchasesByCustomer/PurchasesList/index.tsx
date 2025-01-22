@@ -2,7 +2,7 @@ import { usePurchasesByCustomer } from '~/hooks/query/usePurchasesByCustomer'
 import { match, P } from 'ts-pattern'
 import * as S from './style'
 
-interface PurchasesListProps {
+type PurchasesListProps = {
   customerId: number
 }
 

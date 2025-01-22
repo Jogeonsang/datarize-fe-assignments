@@ -34,7 +34,7 @@ type Props<ErrorType extends Error = Error> = {
   ignoreError?: IgnoreErrorType
 }
 
-interface State<ErrorType extends Error = Error> {
+type State<ErrorType extends Error = Error> = {
   error: ErrorType | null
 }
 

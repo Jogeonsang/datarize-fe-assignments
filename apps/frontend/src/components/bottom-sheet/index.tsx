@@ -5,7 +5,7 @@ import { useScrollLock } from '~/hooks'
 import Portal from '../portal'
 import { SerializedStyles } from '@emotion/react'
 
-interface BottomSheetProps {
+type BottomSheetProps = {
   isOpen: boolean
   onClose: () => void
   children: React.ReactNode

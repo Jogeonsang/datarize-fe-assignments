@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import { InputHTMLAttributes, forwardRef } from 'react'
 
-interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+type InputProps = InputHTMLAttributes<HTMLInputElement> & {
   label?: string
   error?: string
 }

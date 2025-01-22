@@ -1,7 +1,7 @@
 import styled from '@emotion/styled'
 import { motion } from 'motion/react'
 
-interface SkeletonProps {
+type SkeletonProps = {
   width?: string | number
   height?: string | number
   borderRadius?: string | number

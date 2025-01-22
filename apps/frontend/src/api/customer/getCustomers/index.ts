@@ -2,7 +2,7 @@ import { safeGet } from '~/lib'
 import { z } from 'zod'
 import { CustomerSchema } from './type'
 
-export interface GetCustomersParams {
+export type GetCustomersParams = {
   sortBy?: 'asc' | 'desc'
   name?: string
 }

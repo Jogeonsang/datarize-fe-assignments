@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { useCustomersSearch, useCustomersSearchResult } from '~/hooks/query/useCustomers'
 import { AArrowUp, AArrowDown } from '@mynaui/icons-react'
 import Input from '~/components/input'
@@ -34,7 +34,9 @@ function CustomerList() {
       return undefined
     })
   }
-  const renderCustomerRows = useCallback((customers: typeof data) => {
+
+  // useCallback, useMemo 제거
+  const renderCustomerRows = (customers: typeof data) => {
     return customers.map((customer) => (
       <S.TableRow key={customer.id} onClick={() => handleRowClick(customer.id)} style={{ cursor: 'pointer' }}>
         <S.TableCell>{customer.id}</S.TableCell>
@@ -43,9 +45,9 @@ function CustomerList() {
         <S.TableCell>{customer.count}</S.TableCell>
       </S.TableRow>
     ))
-  }, [])
+  }
 
-  const renderContent = useMemo(() => {
+  const renderContent = () => {
     const hasError = searchError !== null || searchCustomersError !== null
 
     return match({ data, hasError, isSearching })
@@ -62,7 +64,7 @@ function CustomerList() {
       .with({ data: [] }, () => <CustomerListEmpty />)
       .with({ data: P.array(P.any) }, ({ data: customers }) => renderCustomerRows(customers))
       .exhaustive()
-  }, [data, searchError, searchCustomersError, isSearching, handleSearch, renderCustomerRows])
+  }
 
   useEffect(() => {
     if (!sortBy) return
@@ -101,7 +103,7 @@ function CustomerList() {
               <S.TableHeader>구매 횟수</S.TableHeader>
             </S.TableRow>
           </S.TableHead>
-          <S.TableBody>{renderContent}</S.TableBody>
+          <S.TableBody>{renderContent()}</S.TableBody>
         </S.Table>
       </S.TableWrapper>
 

@@ -80,3 +80,61 @@ components는 "재사용이 가능한" 이라는 점에 집중하고있는 반�
 문서에 API명세 route가 다음과 같이 되어있습니다. `/api/customer/{id}/purchases`.
 하지만 Backend code를 보았을 때 `/api/customers/{id}/purchases` 로 요청해야하여
 프론트 코드에서 위와같이 호출하고 있습니다.
+
+---
+
+### 추가된 내용
+
+Typescript 타입 선언 컨벤션
+
+#### 기본 원칙
+
+- 모든 타입 선어는 기본적으로 `type`을 사용합니다.
+
+Type 선언 방식에 `interface`와 `type`이 있지만 하나의 type 선언방식으로 정의하여 다음과 같은 효과를 기대합니다.
+
+1. 일관성 있는 코드베이스 유지
+2. 개발자의 의사결정 비용 감소
+3. 명확한 컨벤션 제시
+
+#### 계층별 타입 사용 방식
+
+1. **API 계층**
+
+   - Zod 스키마를 사용하여 런타임 데이터 검증
+   - 스키마로부터 타입 추론 (`z.infer<typeof Schema>`)
+
+```typescript
+// 1. API 계층
+export const UserSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+});
+```
+
+2. **Data 계층 (React Query 등)**
+
+   - 유틸리티 타입을 활용하여 API 응답 타입과 정확한 동기화
+   - 예: `type Response = Awaited<ReturnType<typeof apiFunction>>`
+
+```typescript
+// 2. Data 계층
+type UserResponse = Awaited<ReturnType<typeof getUser>>;
+```
+
+3. **UI 계층 (feature, props)**
+   - API 응답 전체 구조가 아닌 필요한 데이터 타입만 사용
+   - 예: `type CardProps = { item: Purchase }`
+
+```typescript
+// 3. UI 계층
+type UserCardProps = {
+  user: User;
+  onEdit?: (id: number) => void;
+};
+```
+
+#### interface 사용 케이스
+
+- 복잡한 상속 구조가 필요한 경우
+- 개발자가 명확한 이유로 interface가 필요하다고 생각이 되는 경우
